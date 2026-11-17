@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/header :: head('Dashboard')}"></head>
+<body class="pagina-interna">
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container panel-wrap">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Dashboard</h2>
+        <div class="d-flex gap-2">
+            <a th:href="@{/admin/pedidos}" class="btn btn-outline-primary">Ver pedidos</a>
+            <a th:href="@{/admin/mensajes}" class="btn btn-outline-primary">Ver mensajes</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="stat-card"><span>Pedidos</span><strong th:text="${resumen.totalPedidos}">0</strong></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card"><span>Pendientes</span><strong th:text="${resumen.pendientes}">0</strong></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card"><span>Ventas estimadas</span><strong>S/ <span th:text="${#numbers.formatDecimal(resumen.ventas, 1, 2)}">0.00</span></strong></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card"><span>Clientes</span><strong th:text="${resumen.clientes}">0</strong></div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card grafico-card h-100"><div class="card-body">
+                <h5>Pedidos por servicio</h5>
+                <p class="text-muted small" th:if="${#lists.isEmpty(resumen.porServicio)}">Todavía no hay pedidos.</p>
+                <div class="barra-fila" th:each="b : ${resumen.porServicio}">
+                    <span class="barra-etiqueta" th:text="${b.etiqueta}">Servicio</span>
+                    <div class="barra"><div class="barra-relleno" th:style="'width:' + ${b.porcentaje} + '%'"></div></div>
+                    <span class="barra-valor" th:text="${b.valor}">0</span>
+                </div>
+            </div></div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card grafico-card h-100"><div class="card-body">
+                <h5>Pedidos por estado</h5>
+                <div class="barra-fila" th:each="b : ${resumen.porEstado}">
+                    <span class="barra-etiqueta" th:text="${b.etiqueta}">Estado</span>
+                    <div class="barra"><div class="barra-relleno barra-estado" th:style="'width:' + ${b.porcentaje} + '%'"></div></div>
+                    <span class="barra-valor" th:text="${b.valor}">0</span>
+                </div>
+            </div></div>
+        </div>
+    </div>
+
+    <h5>Últimos pedidos</h5>
+    <div class="table-responsive mb-4">
+        <table class="table align-middle">
+            <thead><tr><th>N.º</th><th>Fecha</th><th>Cliente</th><th>Servicio</th><th>Total</th><th>Estado</th></tr></thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(resumen.ultimos)}"><td colspan="6" class="text-muted">Sin pedidos todavía.</td></tr>
+            <tr th:each="p : ${resumen.ultimos}">
+                <td th:text="${p.id}">1</td>
+                <td th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy HH:mm')}">fecha</td>
+                <td th:text="${p.usuario.nombre}">cliente</td>
+                <td th:text="${p.servicio.nombre}">servicio</td>
+                <td>S/ <span th:text="${#numbers.formatDecimal(p.total, 1, 2)}">0.00</span></td>
+                <td><span class="badge" th:classappend="${'estado-' + p.estado.name()}" th:text="${p.estado.etiqueta}">Recibido</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h5>Usuarios</h5>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Registro</th><th>Rol</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}">
+                <td th:text="${u.nombre}">nombre</td>
+                <td th:text="${u.email}">correo</td>
+                <td th:text="${u.telefono}">teléfono</td>
+                <td th:text="${#temporals.format(u.fechaRegistro, 'dd/MM/yyyy')}">fecha</td>
+                <td><span class="badge text-bg-secondary" th:text="${u.rol}">USER</span></td>
+                <td class="text-end">
+                    <form th:if="${u.email != emailActual}" th:action="@{/admin/usuarios/{id}/rol(id=${u.id})}" method="post">
+                        <button type="submit" class="btn btn-sm btn-outline-primary"
+                                th:text="${u.rol.name() == 'ADMIN'} ? 'Pasar a cliente' : 'Pasar a administrador'">Cambiar rol</button>
+                    </form>
+                    <span th:if="${u.email == emailActual}" class="text-muted small">Tu cuenta</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/scroll.js}"></script>
+</body>
+</html>

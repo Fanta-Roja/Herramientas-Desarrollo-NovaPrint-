@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/header :: head('Mensajes de contacto')}"></head>
+<body class="pagina-interna">
+<nav th:replace="~{fragments/navbar :: navbar}"></nav>
+<main class="container panel-wrap">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Mensajes de contacto</h2>
+        <a th:href="@{/admin/pedidos}" class="btn btn-outline-primary">Volver a pedidos</a>
+    </div>
+    <div th:if="${#lists.isEmpty(mensajes)}" class="alert alert-light border">No hay mensajes todavía.</div>
+    <div class="list-group">
+        <div class="list-group-item" th:each="m : ${mensajes}">
+            <div class="d-flex justify-content-between">
+                <strong th:text="${m.nombre}">Nombre</strong>
+                <small class="text-muted" th:text="${#temporals.format(m.fechaEnvio, 'dd/MM/yyyy HH:mm')}">fecha</small>
+            </div>
+            <div class="small text-muted mb-2"><span th:text="${m.email}">correo</span> <span th:if="${m.telefono != null and !m.telefono.isBlank()}" th:text="${'· ' + m.telefono}"></span></div>
+            <p class="mb-0" th:text="${m.mensaje}">mensaje</p>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/scroll.js}"></script>
+</body>
+</html>
