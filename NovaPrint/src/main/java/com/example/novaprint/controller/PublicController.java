@@ -1,16 +1,20 @@
 package com.example.novaprint.controller;
 
+import com.example.novaprint.dto.ContactoForm;
+import com.example.novaprint.dto.RegistroForm;
 import com.example.novaprint.entity.Contacto;
 import com.example.novaprint.entity.Usuario;
 import com.example.novaprint.repository.ContactoRepository;
 import com.example.novaprint.repository.ServicioRepository;
 import com.example.novaprint.repository.UsuarioRepository;
+import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 // Páginas públicas: portada, login, registro y contacto.
@@ -43,59 +47,51 @@ public class PublicController {
         return "login";
     }
 
-    // Formulario de registro.
+    // Formulario de registro (con un objeto vacío para enlazar los campos).
     @GetMapping("/registro")
-    public String registro() {
+    public String registro(Model model) {
+        model.addAttribute("form", new RegistroForm("", "", "", "", ""));
         return "registro";
     }
 
-    // Valida los datos y crea el usuario con la contraseña cifrada.
+    // Valida los datos, muestra los errores junto a cada campo y crea el usuario.
     @PostMapping("/procesarRegistro")
-    public String procesarRegistro(@RequestParam String nombre,
-                                   @RequestParam String email,
-                                   @RequestParam String telefono,
-                                   @RequestParam String password,
-                                   @RequestParam String confirmarPassword,
-                                   Model model) {
-        String error = null;
-        if (nombre.isBlank() || telefono.isBlank()) {
-            error = "Completa tu nombre y tu teléfono.";
-        } else if (password.length() < 5) {
-            error = "La contraseña debe tener al menos 5 caracteres.";
-        } else if (!password.equals(confirmarPassword)) {
-            error = "Las contraseñas no coinciden.";
-        } else if (usuarioRepository.existsByEmail(email.trim().toLowerCase())) {
-            error = "Ese correo ya está registrado. Prueba iniciando sesión.";
+    public String procesarRegistro(@Valid @ModelAttribute("form") RegistroForm form,
+                                   BindingResult result) {
+        String email = form.email() == null ? "" : form.email().trim().toLowerCase();
+
+        if (!result.hasErrors() && !form.password().equals(form.confirmarPassword())) {
+            result.rejectValue("confirmarPassword", "noCoincide", "Las contraseñas no coinciden.");
         }
-        if (error != null) {
-            model.addAttribute("error", error);
-            model.addAttribute("nombre", nombre);
-            model.addAttribute("email", email);
-            model.addAttribute("telefono", telefono);
+        if (!result.hasErrors() && usuarioRepository.existsByEmail(email)) {
+            result.rejectValue("email", "duplicado", "Ese correo ya está registrado. Prueba iniciando sesión.");
+        }
+        if (result.hasErrors()) {
             return "registro";
         }
 
         Usuario u = new Usuario();
-        u.setNombre(nombre.trim());
-        u.setEmail(email.trim().toLowerCase());
-        u.setTelefono(telefono.trim());
-        u.setPassword(passwordEncoder.encode(password));
+        u.setNombre(form.nombre().trim());
+        u.setEmail(email);
+        u.setTelefono(form.telefono().trim());
+        u.setPassword(passwordEncoder.encode(form.password()));
         usuarioRepository.save(u);
         return "redirect:/login?registroExitoso";
     }
 
-    // Guarda el mensaje del formulario de contacto.
+    // Valida y guarda el mensaje del formulario de contacto.
     @PostMapping("/procesarContacto")
-    public String procesarContacto(@RequestParam String nombre,
-                                   @RequestParam String email,
-                                   @RequestParam(required = false) String telefono,
-                                   @RequestParam String mensaje,
+    public String procesarContacto(@Valid ContactoForm form, BindingResult result,
                                    RedirectAttributes redirect) {
+        if (result.hasErrors()) {
+            redirect.addAttribute("errorContacto", true);
+            return "redirect:/#contacto";
+        }
         Contacto c = new Contacto();
-        c.setNombre(nombre.trim());
-        c.setEmail(email.trim());
-        c.setTelefono(telefono);
-        c.setMensaje(mensaje.length() > 1000 ? mensaje.substring(0, 1000) : mensaje);
+        c.setNombre(form.nombre().trim());
+        c.setEmail(form.email().trim().toLowerCase());
+        c.setTelefono(form.telefono() == null || form.telefono().isBlank() ? null : form.telefono().trim());
+        c.setMensaje(form.mensaje().trim());
         contactoRepository.save(c);
         redirect.addAttribute("exito", true);
         return "redirect:/#contacto";
