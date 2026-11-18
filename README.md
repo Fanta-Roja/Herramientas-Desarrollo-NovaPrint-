@@ -20,8 +20,8 @@ Portada con los servicios del negocio, sus precios y un formulario de contacto.
 Cotizador de precios en pantalla: (precio + recargo por color) x cantidad, con 10 % de descuento por doble cara en los servicios que lo permiten. El servidor vuelve a calcular el total al guardar el pedido.
 Registro e inicio de sesión de clientes, con contraseñas cifradas (BCrypt).
 Validaciones en los formularios:
-Registro: nombre obligatorio (máximo 100 caracteres), correo válido, teléfono de 9 dígitos, contraseña de 6 a 72 caracteres y confirmación de la contraseña.
-Contacto: nombre y correo obligatorios, teléfono de hasta 20 caracteres y mensaje de hasta 1000 caracteres.
+Registro: nombre obligatorio, correo válido, teléfono de 9 dígitos, contraseña de 6 a 72 caracteres y confirmación de la contraseña.
+Contacto: nombre y correo obligatorios, teléfono.
 Bloqueo de cuenta: tras 5 contraseñas incorrectas seguidas, la cuenta se bloquea 15 minutos y se muestra un aviso. Un ingreso correcto reinicia el contador. Los valores se cambian con app.login.max-intentos y app.login.bloqueo-minutos.
 Pedidos: el cliente crea un pedido (servicio, cantidad, color, doble cara, notas) y sigue su estado en Mis pedidos.
 Panel del administrador: lista todos los pedidos, cambia su estado (Recibido, En proceso, Listo, Entregado, Cancelado) y muestra los mensajes de contacto.
