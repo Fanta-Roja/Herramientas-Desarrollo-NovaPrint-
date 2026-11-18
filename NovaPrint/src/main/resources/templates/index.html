@@ -84,6 +84,9 @@
             </div>
             <div class="col-lg-7">
                 <form th:action="@{/procesarContacto}" method="post">
+                    <div th:if="${param.errorContacto}" class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>Revisa los datos: nombre, un correo válido y un mensaje de máximo 1000 caracteres.
+                    </div>
                     <div th:if="${param.exito}" id="mensajeExito" class="alert alert-success">
                         <i class="fas fa-check-circle me-2"></i>¡Gracias! Recibimos tu mensaje y te responderemos pronto.
                     </div>
