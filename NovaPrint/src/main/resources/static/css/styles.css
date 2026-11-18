@@ -44,7 +44,7 @@ a { color: var(--cian-oscuro); }
 .hero-content { position: relative; z-index: 2; }
 
 .cmyk-stack { position: relative; width: 320px; height: 320px; margin-left: auto; }
-.cmyk-stack span { position: absolute; width: 190px; height: 250px; border-radius: 4px; mix-blend-mode: screen; opacity: .9; }
+.cmyk-stack span { position: absolute; width: 190px; height: 250px; border-radius: 14px; mix-blend-mode: screen; opacity: .9; }
 .cmyk-stack .c { background: #00aeef; top: 10px; left: 10px; }
 .cmyk-stack .m { background: #ec008c; top: 30px; left: 60px; }
 .cmyk-stack .y { background: #fff200; top: 50px; left: 110px; }
