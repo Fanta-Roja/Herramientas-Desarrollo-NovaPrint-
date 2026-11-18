@@ -60,8 +60,8 @@ public class PublicController {
         String error = null;
         if (nombre.isBlank() || telefono.isBlank()) {
             error = "Completa tu nombre y tu teléfono.";
-        } else if (password.length() < 6) {
-            error = "La contraseña debe tener al menos 6 caracteres.";
+        } else if (password.length() < 5) {
+            error = "La contraseña debe tener al menos 5 caracteres.";
         } else if (!password.equals(confirmarPassword)) {
             error = "Las contraseñas no coinciden.";
         } else if (usuarioRepository.existsByEmail(email.trim().toLowerCase())) {
